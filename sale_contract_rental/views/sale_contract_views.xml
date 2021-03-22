@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_rental_sale_contract"
+              name="Contracts"
+              action="sale_contract.sale_contract_action"
+              parent="sale_renting.rental_order_menu"
+              sequence="6" groups="sales_team.group_sale_salesman"/>
+
+    <record id="sale_contract_rental_amount" model="ir.ui.view">
+        <field name="name">sale.contract.rental.amount</field>
+        <field name="model">sale.contract</field>
+        <field name="inherit_id" ref="sale_contract.contract_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='recurring']" position="after">
+                <group>
+                    <field name="invoice_amount_type" attrs="{'invisible': [('is_recurring', '=', False)]}"/>
+                </group>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

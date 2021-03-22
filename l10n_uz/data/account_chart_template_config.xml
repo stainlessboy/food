@@ -1,8 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <data>
+        <record id="l10n_uz_nsbu_chart_template" model="account.chart.template">
+            <field name="complete_tax_set" eval="True"/>
+            <field name="use_anglo_saxon" eval="True"/>
+
+            <field name="property_account_receivable_id" ref="uz_nsbu_401000"/>
+            <field name="property_account_payable_id" ref="uz_nsbu_601000"/>
+
+<!--            <field name="property_account_expense_categ_id" ref="expense"/>-->
+<!--            <field name="property_account_income_categ_id" ref="income"/>-->
+
+<!--            <field name="property_stock_account_input_categ_id" ref="stock_in"/>-->
+<!--            <field name="property_stock_account_output_categ_id" ref="stock_out"/>-->
+<!--            <field name="property_stock_valuation_account_id" ref="stock_valuation"/>-->
+
+<!--            <field name="income_currency_exchange_account_id" ref="income_currency_exchange"/>-->
+<!--            <field name="expense_currency_exchange_account_id" ref="expense_currency_exchange"/>-->
+
+<!--            <field name="default_cash_difference_income_account_id" ref="cash_diff_income"/>-->
+<!--            <field name="default_cash_difference_expense_account_id" ref="cash_diff_expense"/>-->
+        </record>
+    </data>
+
     <data noupdate="1">
         <function model="account.chart.template" name="try_loading">
             <value eval="[ref('l10n_uz.l10n_uz_nsbu_chart_template')]"/>
         </function>
     </data>
+
+
 </odoo>

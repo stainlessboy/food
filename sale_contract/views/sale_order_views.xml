@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sale_order_form_contract" model="ir.ui.view">
+        <field name="name">sale.order.form.contract</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="contract_id" context="{'default_company_id': company_id, 'default_partner_id': partner_id}" domain="[('partner_id','=',partner_id)]"
+                />
+                <field name="is_subcontract" attrs="{'invisible': [('contract_id', '=', False)]}"/>
+                <field name="subcontract_type" attrs="{'invisible': [('is_subcontract', '=', False)]}" />
+            </xpath>
+
+        </field>
+    </record>
+    <record id="view_order_tree_contract" model="ir.ui.view">
+        <field name="name">sale.order.tree.contract</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="contract_id" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_quotation_tree_contract" model="ir.ui.view">
+        <field name="name">sale.order.tree.contract</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="contract_id" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_sales_order_filter_contract" model="ir.ui.view">
+        <field name="name">sale.order.list.select.contract</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='customer']" position="after">
+                <filter name="contract" string="Contract" domain="[]" context="{'group_by': 'contract_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="act_contract_2_sale_orders" model="ir.actions.act_window">
+        <field name="name">Sale Orders</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_contract_id': active_id, 'default_contract_id': active_id}</field>
+        <field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+    </record>
+</odoo>

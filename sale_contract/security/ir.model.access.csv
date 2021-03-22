@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sale_contract_manager,access_sale_contract_manager,model_sale_contract,sales_team.group_sale_salesman,1,1,1,1
+access_sale_contract_line_manager,access_sale_contract_line_manager,model_sale_contract_line,sales_team.group_sale_salesman,1,1,1,1
+access_sale_subcontract_manager,access_sale_subcontract_manager,model_sale_subcontract,sales_team.group_sale_salesman,1,1,1,1
+access_sale_subcontract_type_manager,access_sale_subcontract_type_manager,model_sale_subcontract_type,sales_team.group_sale_salesman,1,1,1,1

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sale_contract_action" model="ir.actions.act_window">
+        <field name="name">Contracts</field>
+        <field name="res_model">sale.contract</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{
+            "search_default_my_contracts":1
+            }
+        </field>
+        <field name="domain">[]</field>
+        <field name="search_view_id" eval='False'/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new contract
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="contract_view_form">
+        <field name="name">contract.form.view</field>
+        <field name="model">sale.contract</field>
+        <field name="arch" type="xml">
+            <form string="Contract Form">
+                <header>
+                    <button name="action_confirm" class="btn-primary"
+                        string="Confirm" type="object"
+                        attrs="{'invisible': [('state', 'not in', ['draft'])]}"/>
+
+                    <button name="action_done" class="btn-primary"
+                        string="Done" type="object"
+                        attrs="{'invisible': [('state', 'not in', ['confirmed'])]}"/>
+
+                    <button name="action_cancel" states="draft,confirmed,done" type="object" string="Cancel"/>
+                    <button name="action_draft" states="cancel" type="object" string="Reset to draft"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done,cancel"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button"
+                            icon="fa-credit-card"
+                            name="%(sale_contract.act_contract_2_sale_orders)d"
+                            type="action">
+                            <field name="sale_order_count" widget="statinfo" string="Sales"/>
+                        </button>
+                        <button class="oe_stat_button"
+                            icon="fa-book"
+                            name="%(sale_contract.act_contract_2_invoices)d"
+                            type="action">
+                            <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <div class="oe_title">
+                        <h1 class="flex-fill d-flex flex-row" attrs="{'invisible': [('id', '=', False)]}">
+                            <field name="display_name" class="text-truncate"/>
+                        </h1>
+                    </div>
+                    <group name="main">
+                        <group>
+                            <field name="active" required="1"/>
+                            <field name="name" required="1"/>
+                            <field name="partner_id" required="1"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="pricelist_id" groups="product.group_product_pricelist"/>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                        </group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="update_contract_lines" required="1"/>
+                        </group>
+                        <group name="recurring">
+                            <field name="is_recurring" required="1"/>
+                            <label for="recurring_interval" attrs="{'invisible': [('is_recurring', '=', False)]}"/>
+                            <div class="o_row" attrs="{'invisible': [('is_recurring', '=', False)]}">
+                                <span class="mr-1">Every</span>
+                                <field name="recurring_interval" required="1"/>
+                                <field name="recurring_rule_type" class="field_rule_type" required="1"/>
+                            </div>
+                            <label for="recurring_next_date" string="Date of Next Invoice" attrs="{'invisible': [('is_recurring', '=', False)]}"/>
+                            <div attrs="{'invisible': [('is_recurring', '=', False)]}">
+                                <field name="recurring_next_date"/>
+                                <button name="recurring_invoice"
+                                        string="Generate Invoice"
+                                        class="oe_link"
+                                        icon="fa-long-arrow-right"
+                                        type="object"
+                                        groups="base.group_no_one"
+                                        />
+                            </div>
+                        </group>
+                    </group>
+                    <div>
+                        <notebook>
+                            <page string="Contract Lines" id="lines">
+                                <div>
+                                    <field name="contract_line_ids">
+                                        <tree editable="bottom" create="false" >
+                                            <field name="product_id" domain="['|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]" readonly="1"/>
+                                            <field name="name" optional="show" readonly="1"/>
+                                            <field name="quantity" readonly="1"/>
+                                            <field name="product_uom_category_id" invisible="1" readonly="1"/>
+                                            <field name="uom_id" string="UoM" groups="uom.group_uom" optional="show" readonly="1"/>
+                                            <field name="price_unit" readonly="1"/>
+                                            <field
+                                                name="tax_id"
+                                                widget="many2many_tags"
+                                                readonly="1"
+                                                optional="show"
+                                            />
+                                            <field name="discount" string="Disc.%" groups="product.group_discount_per_so_line" readonly="1"/>
+                                            <field name="price_tax" invisible="1"/>
+                                            <field name="price_subtotal" readonly="1" invisible="1"/>
+                                            <field name="price_total" readonly="1"/>
+                                        </tree>
+                                        <form string="Contract Lines">
+                                            <group>
+                                                <group>
+                                                    <field name="product_id" domain="['|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]" />
+                                                    <field name="name"/>
+                                                    <label for="quantity"/>
+                                                    <field name="product_uom_category_id" invisible="1"/>
+                                                    <div class="o_row">
+                                                        <field name="quantity"/>
+                                                        <field name="uom_id"/>
+                                                    </div>
+                                                    <field name="price_unit"/>
+                                                    <field name="discount" groups="product.group_discount_per_so_line"/>
+                                                </group>
+                                            </group>
+                                        </form>
+                                    </field>
+                                    <group class="oe_subtotal_footer oe_right">
+                                        <field name="contract_total" class="oe_subtotal_footer_separator"
+                                            widget="monetary" options="{'currency_field': 'currency_id'}"
+                                            modifiers="{'readonly': true}"
+                                        />
+                                    </group>
+                                </div>
+                            </page>
+                            <page string="Subcontracts" id="subcontracts">
+                                <div>
+                                    <field name="subcontract_ids">
+                                        <tree editable="bottom">
+                                            <field name="name" />
+                                            <field name="subcontract_type"/>
+                                            <field name="sale_order_id" />
+                                        </tree>
+                                    </field>
+                                </div>
+                            </page>
+                        </notebook>
+                    </div>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="contract_view_list" model="ir.ui.view">
+        <field name="name">contract.list.view</field>
+        <field name="model">sale.contract</field>
+        <field name="arch" type="xml">
+            <tree string="Sale Contract" multi_edit="1">
+                <field name="active" invisible="1"/>
+                <field name="display_name" readonly="1"/>
+                <field name="name" readonly="1"/>
+                <field name="partner_id" readonly="1"/>
+
+                <field name="user_id" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" readonly="1"/>
+                <field name="state" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="sale_contract_view_search" model="ir.ui.view">
+        <field name="name">sale.contract.search</field>
+        <field name="model">sale.contract</field>
+        <field name="arch" type="xml">
+            <search string="All contracts">
+                <field name="name" string="Order"
+                        filter_domain="['|', '|', ('name', 'ilike', self), ('partner_ref', 'ilike', self), ('partner_id', 'child_of', self)]"/>
+                <field name="partner_id" operator="child_of"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+           </search>
+        </field>
+    </record>
+
+    <menuitem id="menu_sale_contract"
+              name="Contracts"
+              action="sale_contract_action"
+              parent="sale.sale_order_menu"
+              sequence="6" groups="sales_team.group_sale_salesman"/>
+
+
+    <record id="act_res_partner_2_contract" model="ir.actions.act_window">
+        <field name="name">Contracts</field>
+        <field name="res_model">sale.contract</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_partner_id': active_id, 'default_partner_id': active_id}</field>
+        <field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+    </record>
+</odoo>
